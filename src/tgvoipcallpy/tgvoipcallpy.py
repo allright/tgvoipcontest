@@ -3,7 +3,7 @@ import requests
 import subprocess
 import json
 
-hash = '677067:77f2c58ea74619d0a8115755ed7fcd62682a'
+auth_token = '677067:77f2c58ea74619d0a8115755ed7fcd62682a'
 
 def write_to_file(resp, filename):
     f = open(filename, 'w')
@@ -12,7 +12,7 @@ def write_to_file(resp, filename):
 
 
 def get_config_for_call(call_id):
-    url = "https://api.contest.com/voip%s/getConnection?call=%s" % (hash,call_id)
+    url = "https://api.contest.com/voip%s/getConnection?call=%s" % (auth_token,call_id)
     return requests.get(url)
 
 

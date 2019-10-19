@@ -1,0 +1,18 @@
+FROM debian:10.1
+RUN apt-get update -y && \
+    apt-get clean && \
+    apt-get install -y \
+    build-essential unzip make cmake \
+    && \
+    apt-get clean
+
+RUN mkdir /work
+WORKDIR /work
+COPY submission.zip ./
+RUN unzip submission.zip
+WORKDIR submission/src
+RUN mkdir .build
+WORKDIR .build
+RUN pwd
+RUN cmake ../tgvoiprate -DCMAKE_BUILD_TYPE=RelWithDebInfo
+RUN make -j8

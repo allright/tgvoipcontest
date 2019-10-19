@@ -1,3 +1,3 @@
 #!/bin/sh
-docker build -t tgvoipcontext -f ./DockerfileTestSubmission ../../
+docker build -t tgvoipcontest -f ./DockerfileTestSubmission ../../
 

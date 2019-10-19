@@ -1,3 +1,3 @@
 #!/bin/sh
-docker run tgvoipcontext tgvoipcallpy/tgvoipcallpy.py
+docker run tgvoipcontest tgvoipcallpy/tgvoipcallpy.py
 

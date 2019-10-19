@@ -3,6 +3,7 @@ import requests
 import subprocess
 import json
 import random
+import sys
 
 auth_token = '677067:77f2c58ea74619d0a8115755ed7fcd62682a'
 
@@ -16,6 +17,10 @@ def get_config_for_call(call_id):
     url = "https://api.contest.com/voip%s/getConnection?call=alrightid%s" % (auth_token,call_id)
     print url
     return requests.get(url)
+
+
+print(sys.argv)
+
 
 random_call_id = random.randint(1,10000000000000000)
 response = get_config_for_call(random_call_id)
@@ -40,9 +45,11 @@ peer_tags = endpoint['peer_tags']
 tag_caller_hex = peer_tags['caller']
 tag_callee_hex = peer_tags['callee']
 
+app = sys.argv[1]
+
 print reflector
 print port
 print tag_caller_hex
 print tag_callee_hex
 
-subprocess.call(["ls", "-l"])
+subprocess.call([app, "in.wav", "oo.wav"])

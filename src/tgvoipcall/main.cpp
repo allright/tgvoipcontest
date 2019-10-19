@@ -18,7 +18,6 @@ using namespace tgvoip;
 //}
 
 
-
 int main (int argc, const char *argv []) {
 
 

@@ -12,7 +12,7 @@ if (APPLE)
     set(LIBS libcrypto.a)
     include_directories(/usr/local/Cellar/openssl@1.1/1.1.1d/include/)
 else()
-    set(LIBS crypto pthread)
+    set(LIBS crypto pthread opus)
 endif ()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWEBRTC_POSIX -DTGVOIP_USE_CALLBACK_AUDIO_IO")
 

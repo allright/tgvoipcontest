@@ -12,8 +12,11 @@ RUN mkdir /work
 WORKDIR /work
 COPY submission.zip ./
 RUN unzip submission.zip
-WORKDIR submission/src
+WORKDIR submission
 
 RUN pwd
 RUN ls -al
-RUN tgvoipcallpy/tgvoipcallpy.py
+RUN ./src/tgvoipcallpy/tgvoipcallpy.py
+#RUN ./tgvoiprate
+
+

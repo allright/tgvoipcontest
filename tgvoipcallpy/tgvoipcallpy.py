@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 import requests
 import subprocess
+import json
 
 
 def write_to_file(resp, filename):
     f = open(filename, 'w')
-    f.write(resp.text)
+    f.write(resp)
     f.close()
 
 
@@ -15,15 +16,16 @@ def get_config_for_call(call_id):
 
 
 response = get_config_for_call('1232131234')
-write_to_file(response, "config.json")
-config = response.json()
-print "get_config_for_call: url %s" % config
+response = response.json()
+print "get_config_for_call: url %s" % response
 
-if not config['ok']:
+if not response['ok']:
     print "malformed response"
     exit(-1)
 
-result = config['result']
+result = response['result']
+config = result['config']
+write_to_file(json.dumps(config), 'config.json')
 endpoints = result['endpoints']
 
 

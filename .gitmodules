@@ -1,0 +1,3 @@
+[submodule "src/tgvoipcall/libs/libtgvoip"]
+	path = src/tgvoipcall/libs/libtgvoip
+	url = git@github.com:allright/libtgvoip.git

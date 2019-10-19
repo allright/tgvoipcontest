@@ -17,7 +17,7 @@ int main(int argc, const char *argv[]) {
 
     try {
         auto res = compare(argv[1], argv[2]);
-        printf("result: %f", res);
+        printf("%f\n", res);
         return 0;
     } catch (std::exception &ex) {
         printf("Exception: '%s'", ex.what());
@@ -115,7 +115,7 @@ static float compare(const char *origPath, const char *degPath) {
     if (deltaSize == 0) {
         return compareBuffers(first, second, 0);
     }
-    printf("deltaSize = %ld\n", deltaSize);
+   // printf("deltaSize = %ld\n", deltaSize);
 
     float rate = 1.0;
     auto bestShift = 0;
@@ -131,6 +131,6 @@ static float compare(const char *origPath, const char *degPath) {
             bestShift = shift;
         }
     }
-    printf("bestShift = %u samples (%f sec) ", bestShift, bestShift / 48000.0);
+   // printf("bestShift = %u samples (%f sec) ", bestShift, bestShift / 48000.0);
     return rate;
 }

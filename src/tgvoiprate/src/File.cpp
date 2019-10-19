@@ -23,7 +23,7 @@ File::File(const char *name) {
     }
 
     auto size = fileSize(f);
-    printf("[%p] File::File(%s) size = %lu\n",this,name, size);
+    //printf("[%p] File::File(%s) size = %lu\n",this,name, size);
     _samples.resize(size);
     if (size < cWavHeaderSize) {
         throw StrException("no wav header in file '%s'",name);

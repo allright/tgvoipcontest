@@ -11,12 +11,15 @@ RUN pip install requests
 RUN mkdir /work
 WORKDIR /work
 COPY submission.zip ./
+COPY testdata ./
+RUN ls -al
+
 RUN unzip submission.zip
 WORKDIR submission
 
 RUN pwd
 RUN ls -al
 RUN ./src/tgvoipcallpy/tgvoipcallpy.py
-#RUN ./tgvoiprate
+RUN ./tgvoiprate ../in.wav ../out.wav
 
 

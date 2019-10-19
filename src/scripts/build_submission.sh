@@ -21,6 +21,7 @@ cd ..
 rm -rf ./.docker_build
 rm -rf ./submission
 
+docker build -t tgvoipcontest -f ./src/scripts/DockerfileTestSubmission .
 
 
 # rm -rf .build

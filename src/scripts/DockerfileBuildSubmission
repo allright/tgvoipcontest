@@ -21,14 +21,11 @@ RUN cmake ../../tgvoiprate -DCMAKE_BUILD_TYPE=RelWithDebInfo
 RUN make -j8
 RUN ls -al
 
+WORKDIR /work/submission/src
+RUN mkdir -p /work/submission/src/.build/tgvoipcall
+WORKDIR /work/submission/src/.build/tgvoipcall
+RUN cmake ../../tgvoipcall -DCMAKE_BUILD_TYPE=RelWithDebInfo
+RUN make -j8
+RUN ls -al
 
 WORKDIR /work/submission/src/.build
-
-#WORKDIR src/libs/libtgvoip
-#RUN ./build_and_install_linux.sh
-
-#WORKDIR /src
-#RUN ls
-#RUN cmake ./
-#RUN make -j8
-#RUN ./tgvoipcall

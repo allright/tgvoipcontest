@@ -20,4 +20,4 @@ include_directories(libs/libtgvoip/webrtc_dsp)
 
 
 add_executable(tgvoipcall main.cpp ./libs/libtgvoip/tests/MockReflector.cpp)
-target_link_libraries(tgvoipcall tgvoip ${LIBS})
+target_link_libraries(tgvoipcall tgvoip.a ${LIBS})

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import requests
+import subprocess
 
 
 def write_to_file(resp, filename):
@@ -39,4 +40,4 @@ print port
 print tag_caller_hex
 print tag_callee_hex
 
-
+subprocess.call(["ls", "-l"])

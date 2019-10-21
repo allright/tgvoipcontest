@@ -183,7 +183,6 @@ typedef struct {
    short* samples;
 
   long  Nsamples;
-  long  apply_swap;
   long  input_filter;
 
   float * data;

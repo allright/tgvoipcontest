@@ -112,27 +112,8 @@ Further information is also available from www.pesq.org
 
 
 int main (int argc, const char *argv []);
-void usage (void);
 void pesq_measure (SIGNAL_INFO * ref_info, SIGNAL_INFO * deg_info,
     ERROR_INFO * err_info, long * Error_Flag, char ** Error_Type, long shift);
-
-void usage (void) {
-    printf ("Usage:\n");
-    printf (" PESQ HELP               Displays this text\n");
-    printf (" PESQ [options] ref deg\n");
-    printf (" Run model on reference ref and degraded deg\n");
-    printf ("\n");
-    printf ("Options: +8000 +16000 +swap +wb\n");
-    printf (" Sample rate - No default. Must select either +8000 or +16000.\n");
-    printf (" Swap byte order - machine native format by default. Select +swap for byteswap.\n");
-    printf (" Default mode of operation is P.862 (narrowband handset listening). Select +wb \n");
-    printf (" to use P.862.2 wideband extension (headphone listening).\n");
-    printf ("\n");
-    printf ("File names may not begin with a + character.\n");
-    printf ("\n");
-    printf ("Files with names ending .wav or .WAV are assumed to have a 44-byte header, which");
-    printf (" is automatically skipped.  All other file types are assumed to have no header.\n");
-}
 
 float pesq(short* orig, unsigned long origSample, short* deg, unsigned long degSamples) {
 
@@ -147,40 +128,35 @@ float pesq(short* orig, unsigned long origSample, short* deg, unsigned long degS
             ref_info.Nsamples = origSample;
             deg_info.samples = deg;
             deg_info.Nsamples = degSamples;
-            ref_info.apply_swap = 0;
-            deg_info.apply_swap = 0;
             ref_info.input_filter = 1;
             deg_info.input_filter = 1;
-			err_info.mode = NB_MODE;
-            ref_info.apply_swap = 0;
-            deg_info.apply_swap = 0;
-            ref_info.input_filter = 2;
-            deg_info.input_filter = 2;
             err_info.mode = WB_MODE;
 
             select_rate (16000L, &Error_Flag, &Error_Type);
          //   for (long shift = 0; shift < 16000*3; shift += 160) {
             long shift = 0;
                 pesq_measure (&ref_info, &deg_info, &err_info, &Error_Flag, &Error_Type, shift);
-                printf ("\n[%lu] P.862.2 Prediction (MOS-LQO):  = %.3f\n", shift, (double) err_info.mapped_mos);
+            //    printf ("\n[%lu] P.862.2 Prediction (MOS-LQO):  = %.3f\n", shift, (double) err_info.mapped_mos);
        //     }
 
  //   }
 
     if (Error_Flag == 0) {
-		if ( err_info.mode == NB_MODE )
-			printf ("\nP.862 Prediction (Raw MOS, MOS-LQO):  = %.3f\t%.3f\n", (double) err_info.pesq_mos,
-			(double) err_info.mapped_mos);
-		else
-			printf ("\nP.862.2 Prediction (MOS-LQO):  = %.3f\n", (double) err_info.mapped_mos);
-        return 0;
+        return err_info.mapped_mos;
+//
+//        if ( err_info.mode == NB_MODE )
+//			printf ("\nP.862 Prediction (Raw MOS, MOS-LQO):  = %.3f\t%.3f\n", (double) err_info.pesq_mos,
+//			(double) err_info.mapped_mos);
+//	//	else
+//		//	printf ("\nP.862.2 Prediction (MOS-LQO):  = %.3f\n", (double) err_info.mapped_mos);
+//        return 0;
     } else {
-        printf ("An error of type %d ", Error_Flag);
-        if (Error_Type != NULL) {
-            printf (" (%s) occurred during processing.\n", Error_Type);
-        } else {
-            printf ("occurred during processing.\n");
-        }
+//        printf ("An error of type %d ", Error_Flag);
+//        if (Error_Type != NULL) {
+//            printf (" (%s) occurred during processing.\n", Error_Type);
+//        } else {
+//            printf ("occurred during processing.\n");
+//        }
 
         return 0;
     }

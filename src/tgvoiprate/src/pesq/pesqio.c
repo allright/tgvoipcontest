@@ -225,7 +225,7 @@ void load_src( long * Error_Flag, char ** Error_Type, SIGNAL_INFO * sinfo, long 
 
     for( read_count = DATAPADDING_MSECS  * (Fs / 1000) + SEARCHBUFFER * Downsample;
          read_count > 0; read_count-- )
-      *(read_ptr++) = 0.0f;
+        *(read_ptr++) = 0.0f;
 
     sinfo-> VAD = safe_malloc( sinfo-> Nsamples * sizeof(float) / Downsample );
     sinfo-> logVAD = safe_malloc( sinfo-> Nsamples * sizeof(float) / Downsample );

@@ -157,15 +157,15 @@ static AVFrame *get_audio_frame(OutputStream *ost)
     return frame;
 }
 
-static void log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt)
-{
-    AVRational *time_base = &fmt_ctx->streams[pkt->stream_index]->time_base;
-    printf("pts:%s pts_time:%s dts:%s dts_time:%s duration:%s duration_time:%s stream_index:%d\n",
-           av_ts2str(pkt->pts), av_ts2timestr(pkt->pts, time_base),
-           av_ts2str(pkt->dts), av_ts2timestr(pkt->dts, time_base),
-           av_ts2str(pkt->duration), av_ts2timestr(pkt->duration, time_base),
-           pkt->stream_index);
-}
+//static void log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt)
+//{
+//    AVRational *time_base = &fmt_ctx->streams[pkt->stream_index]->time_base;
+//    printf("pts:%s pts_time:%s dts:%s dts_time:%s duration:%s duration_time:%s stream_index:%d\n",
+//           av_ts2str(pkt->pts), av_ts2timestr(pkt->pts, time_base),
+//           av_ts2str(pkt->dts), av_ts2timestr(pkt->dts, time_base),
+//           av_ts2str(pkt->duration), av_ts2timestr(pkt->duration, time_base),
+//           pkt->stream_index);
+//}
 
 static int write_frame(AVFormatContext *fmt_ctx, const AVRational *time_base, AVStream *st, AVPacket *pkt)
 {
@@ -173,7 +173,7 @@ static int write_frame(AVFormatContext *fmt_ctx, const AVRational *time_base, AV
     av_packet_rescale_ts(pkt, *time_base, st->time_base);
     pkt->stream_index = st->index;
     /* Write the compressed frame to the media file. */
-    log_packet(fmt_ctx, pkt);
+//    log_packet(fmt_ctx, pkt);
     return av_interleaved_write_frame(fmt_ctx, pkt);
 }
 
@@ -230,6 +230,7 @@ static int write_audio_frame(AVFormatContext *oc, OutputStream *ost,AVFrame *fra
 }
 
 TGOggWriter::TGOggWriter(const char* name) {
+    av_log_set_level(AV_LOG_QUIET);
 
     avformat_alloc_output_context2(&oc, NULL, NULL, name);
     if (!oc)
@@ -286,7 +287,7 @@ TGOggWriter::~TGOggWriter() {
 
 
 void TGOggWriter::Write(const short* data, unsigned long samples) {
-    printf("TGOggWriter::Write(num = %zu)\n",samples);
+  //  printf("TGOggWriter::Write(num = %zu)\n",samples);
     AVFrame *frame = audio_st.tmp_frame;
     assert(frame->nb_samples == 960);
     int16_t *q = (int16_t*)frame->data[0];

@@ -1,6 +1,4 @@
-#include <cmath>
 #include <IPCMSource.h>
-#include "File.h"
 
 extern "C" float pesq(short* orig, unsigned long origSample, short* deg, unsigned long degSamples);
 

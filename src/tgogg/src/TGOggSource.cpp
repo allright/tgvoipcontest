@@ -52,14 +52,14 @@ static int decode_packet(AVCodecContext *ctx, AVFrame *frame, AVPacket *pkt, int
         fprintf(stderr, "Error decoding audio frame\n");
         return ret;
     }
-    printf("r = (%u): %u : %u\n", ret, pkt->size, pkt->duration);
+    //printf("r = (%u): %u : %u\n", ret, pkt->size, pkt->duration);
 
     if (*got_frame) {
         int data_size = av_get_bytes_per_sample(ctx->sample_fmt);
 
-        printf("audio_frame%s nb_samples:%d pts:%s %u: %u\n",
-               cached ? "(cached)" : "", frame->nb_samples,
-               av_ts2timestr(frame->pts, &ctx->time_base), data_size, ctx->channels);
+//        printf("audio_frame%s nb_samples:%d pts:%s %u: %u\n",
+//               cached ? "(cached)" : "", frame->nb_samples,
+//               av_ts2timestr(frame->pts, &ctx->time_base), data_size, ctx->channels);
 
         for (auto i = 0; i < frame->nb_samples; i++)
             for (auto ch = 0; ch < ctx->channels; ch++) {
@@ -67,10 +67,10 @@ static int decode_packet(AVCodecContext *ctx, AVFrame *frame, AVPacket *pkt, int
                 float *t = (float*) p;
                 short s = (short)((*t)*32767.0); //((s >> 8)&0xFF) | ((s << 8)&0xFF00)
                 outSamples.push_back(s);
-                printf("%f: %d ",*t,s );
+         //       printf("%f: %d ",*t,s );
 //                fwrite(p, 1, data_size, f);
             }
-        printf("\n");
+    //    printf("\n");
 
     }
 
@@ -81,7 +81,7 @@ static int decode_packet(AVCodecContext *ctx, AVFrame *frame, AVPacket *pkt, int
 
 static void decode(const char *name, std::vector<short>& outSamples) {
     av_register_all();
-    printf("name = %s\n", name);
+    //printf("name = %s\n", name);
 
     AVFormatContext *fmt_ctx = NULL;
     if (avformat_open_input(&fmt_ctx, name, NULL, NULL) < 0) {
@@ -101,13 +101,13 @@ static void decode(const char *name, std::vector<short>& outSamples) {
     }
 
     int nb_planes = av_sample_fmt_is_planar(audio_dec_ctx->sample_fmt) ? audio_dec_ctx->channels : 1;
-    printf("nb_planes = %u\n", nb_planes);
+   // printf("nb_planes = %u\n", nb_planes);
     uint8_t **audio_dst_data = (uint8_t **) av_mallocz(sizeof(uint8_t *) * nb_planes);
     if (!audio_dst_data) {
         throw StrException("Could not allocate audio data buffers\n");
     }
 
-    av_dump_format(fmt_ctx, 0, name, 0);
+ //   av_dump_format(fmt_ctx, 0, name, 0);
 
     if (!audio_stream) {
         throw StrException("Could not find audio stream in the input, aborting\n");
@@ -150,6 +150,8 @@ static void decode(const char *name, std::vector<short>& outSamples) {
 }
 
 TGOggSource::TGOggSource(const char *name) {
+    av_log_set_level(AV_LOG_QUIET);
+
     decode(name,_samples);
 }
 

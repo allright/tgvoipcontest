@@ -99,11 +99,12 @@ int main (int argc, const char *argv []) {
         controller1.Connect();
         controller2.Connect();
 
-        usleep(1000000);
-        reflector.SetDropAllPackets(false);
-        usleep(6000000);
-        reflector.SetDropAllPackets(false);
-        usleep(4000000);
+        usleep(20000000);
+//        usleep(1000000);
+//        reflector.SetDropAllPackets(false);
+//        usleep(6000000);
+//        reflector.SetDropAllPackets(false);
+//        usleep(4000000);
 
     //    [NSThread sleepForTimeInterval:3.0];
         controller1.Stop();

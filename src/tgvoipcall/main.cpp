@@ -5,6 +5,7 @@
 #include "libs/libtgvoip/tests/MockReflector.h"
 #include "libs/libtgvoip/webrtc_dsp/common_audio/wav_file.h"
 #include <IPCMSource.h>
+#include <IPCMDest.h>
 
 #include <openssl/rand.h>
 #include <algorithm>
@@ -30,10 +31,15 @@ private:
     const short* _end;
 };
 
-class OpusWriter {
+class PCMWriter {
 public:
-    OpusWriter(const char* name);
-    void WriteSamples(const int16_t* samples, size_t num_samples);
+    PCMWriter(IPCMDest& dest):_dest(dest) { }
+    void WriteSamples(const int16_t* samples, size_t num_samples) {
+        _dest.Write(samples,num_samples);
+    }
+
+private:
+    IPCMDest& _dest;
 };
 
 int main (int argc, const char *argv []) {
@@ -42,6 +48,8 @@ int main (int argc, const char *argv []) {
     auto testWavFileOut = argv[2];
 
     auto orig = IPCMSource::openOggFile(testWavFileIn);
+    auto dest = IPCMDest::openOggWriter(testWavFileOut);
+
 
     test::MockReflector reflector("127.0.0.1", 1033);
     reflector.Start();
@@ -49,7 +57,8 @@ int main (int argc, const char *argv []) {
   //  for(int i=0;i<10;i++){
        // webrtc::WavReader wavReader(testWavFileIn);
         PCMReader wavReader(*orig);
-        webrtc::WavWriter wavWriter(testWavFileOut, 48000, 1);
+        PCMWriter wavWriter(*dest);
+      //  webrtc::WavWriter wavWriter(testWavFileOut, 48000, 1);
 
         VoIPController controller1;
         VoIPController controller2;

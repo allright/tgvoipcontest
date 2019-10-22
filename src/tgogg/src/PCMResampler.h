@@ -11,7 +11,7 @@
 
 class PCMResampler: public IPCMSource {
 public:
-    PCMResampler(IPCMSource& source, int from, int to);
+    PCMResampler(std::shared_ptr<IPCMSource>& source, int from, int to);
     const short *Samples() override;
     unsigned long Size() override;
 private:

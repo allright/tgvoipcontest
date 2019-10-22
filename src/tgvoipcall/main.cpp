@@ -47,7 +47,7 @@ int main (int argc, const char *argv []) {
     auto testWavFileIn = argv[1];
     auto testWavFileOut = argv[2];
 
-    auto orig = IPCMSource::openOggFile(testWavFileIn);
+    auto orig = IPCMSource::openOggFile(testWavFileIn, 48000);
     auto dest = IPCMDest::openOggWriter(testWavFileOut);
 
 

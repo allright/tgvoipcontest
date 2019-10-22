@@ -4,7 +4,10 @@
 
 #include "PCMResampler.h"
 
-PCMResampler::PCMResampler(IPCMSource& source, int from, int to) {
+PCMResampler::PCMResampler(std::shared_ptr<IPCMSource>& source, int from, int to) {
+    _samples.resize(source->Size());
+    memcpy(_samples.data(),source->Samples(),source->Size()/2);
+
 //
 //    ost->swr_ctx = swr_alloc();
 //    if (!ost->swr_ctx) {

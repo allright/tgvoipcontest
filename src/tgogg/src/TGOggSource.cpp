@@ -155,6 +155,11 @@ TGOggSource::TGOggSource(const char *name) {
     decode(name,_samples);
 }
 
+#include "PCMResampler.h"
+
 std::shared_ptr<IPCMSource> IPCMSource::openOggFile(const char *name,int freq) {
-    return std::shared_ptr<IPCMSource>(new TGOggSource(name));
+    auto ogg48000source = std::shared_ptr<IPCMSource>(new TGOggSource(name));
+    if (freq == 48000)
+        return ogg48000source;
+    return std::shared_ptr<IPCMSource>(new PCMResampler(ogg48000source, 48000, 16000));
 }

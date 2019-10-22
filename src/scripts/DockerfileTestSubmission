@@ -2,11 +2,11 @@ FROM debian:10.1
 RUN apt-get update -y && \
     apt-get clean && \
     apt-get install -y \
-    unzip python2.7 python-pip libopus-dev libssl-dev \
+    unzip python2.7 python-pip \
+    libopus-dev libssl-dev libavcodec-dev libswresample-dev libavutil-dev libavformat-dev libswscale-dev \
     && apt-get clean
 
 RUN pip install requests
-
 
 RUN mkdir /work
 WORKDIR /work
@@ -19,8 +19,7 @@ WORKDIR submission
 
 RUN pwd
 RUN ls -al
-RUN ./src/tgvoipcallpy/tgvoipcallpy.py
-RUN ./tgvoiprate ../in.wav ../out.wav
-RUN ./tgvoipcall ../in.wav ../o_call.wav
 
-
+#RUN ./src/tgvoipcallpy/tgvoipcallpy.py
+#RUN ./tgvoiprate ../in.wav ../out.wav
+#RUN ./tgvoipcall ../in.wav ../o_call.wav

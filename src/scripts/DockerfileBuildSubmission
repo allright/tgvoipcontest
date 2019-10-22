@@ -4,8 +4,7 @@ RUN apt-get update -y && \
     apt-get install -y \
     build-essential unzip make cmake automake autoconf libtool \
     libopus-dev libssl-dev libavcodec-dev libswresample-dev libavutil-dev libavformat-dev libswscale-dev \
-    && \
-    apt-get clean
+    && apt-get clean
 
 RUN mkdir /work
 WORKDIR /work

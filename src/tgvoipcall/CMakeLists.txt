@@ -16,8 +16,8 @@ else()
 endif ()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWEBRTC_POSIX -DTGVOIP_USE_CALLBACK_AUDIO_IO")
 
-include_directories(libs/libtgvoip/webrtc_dsp)
+include_directories(libs/libtgvoip/webrtc_dsp ../include)
 
 
 add_executable(tgvoipcall main.cpp ./libs/libtgvoip/tests/MockReflector.cpp)
-target_link_libraries(tgvoipcall tgvoip.a ${LIBS})
+target_link_libraries(tgvoipcall tgvoip.a ${LIBS} tgogg)

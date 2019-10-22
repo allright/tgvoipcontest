@@ -431,41 +431,6 @@ void pesq_measure (SIGNAL_INFO * ref_info, SIGNAL_INFO * deg_info,
 			err_info->pesq_mos = -1.0;
 		}
 
-        resultsFile = fopen (ITU_RESULTS_FILE, "at");
-
-        if (resultsFile != NULL) {
-            long start, end;
-
-            if (0 != fseek (resultsFile, 0, SEEK_SET)) {
-                printf ("Could not move to start of results file %s!\n", ITU_RESULTS_FILE);
-                exit (1);
-            }
-            start = ftell (resultsFile);
-
-            if (0 != fseek (resultsFile, 0, SEEK_END)) {
-                printf ("Could not move to end of results file %s!\n", ITU_RESULTS_FILE);
-                exit (1);
-            }
-            end = ftell (resultsFile);
-
-            if (start == end) {
-                fprintf (resultsFile, "REFERENCE\t DEGRADED\t PESQMOS\t MOSLQO\t SAMPLE_FREQ\t MODE\n");
-				fflush (resultsFile);
-            }
-
-			fprintf (resultsFile, "%.3f\t ", err_info->pesq_mos);
-            fprintf (resultsFile, "%.3f\t ", err_info->mapped_mos);
-            fprintf (resultsFile, "%d\t", Fs);
-
-			if ( err_info->mode == NB_MODE )
-				fprintf (resultsFile, "nb");
-			else
-				fprintf (resultsFile, "wb");
-
-           fprintf (resultsFile, "\n", Fs);
-
-           fclose (resultsFile);
-        }
 
     }
 

@@ -4,5 +4,6 @@ project(tgvoiprate)
 set(CMAKE_CXX_STANDARD 14)
 file (GLOB_RECURSE FILES src/*.c*)
 
-
-add_executable(tgvoiprate ${FILES})
+include_directories(../include)
+add_executable(tgvoiprate  ${FILES})
+target_link_libraries(tgvoiprate tgogg)

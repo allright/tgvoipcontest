@@ -4,6 +4,7 @@
 
 #include "TGOggWriter.h"
 #include <StrException.h>
+#include <algorithm>
 
 /* Add an output stream. */
 static void add_stream(OutputStream *ost, AVFormatContext *oc,
@@ -257,13 +258,13 @@ TGOggWriter::TGOggWriter(const char* name) {
     if (ret < 0) {
         throw StrException( "Error occurred when opening output file: %s\n",av_err2str(ret));
     }
-
-    int  encode_audio = 1;
-    while (encode_audio) {
-        /* select the stream to encode */
-        AVFrame* frame = get_audio_frame(&audio_st);
-        encode_audio = !write_audio_frame(oc, &audio_st, frame);
-    }
+//
+//    int  encode_audio = 1;
+//    while (encode_audio) {
+//        /* select the stream to encode */
+//        AVFrame* frame = get_audio_frame(&audio_st);
+//        encode_audio = !write_audio_frame(oc, &audio_st, frame);
+//    }
 
 }
 
@@ -286,7 +287,12 @@ TGOggWriter::~TGOggWriter() {
 
 void TGOggWriter::Write(const short* data, unsigned long samples) {
     printf("TGOggWriter::Write(num = %zu)\n",samples);
-
+    AVFrame *frame = audio_st.tmp_frame;
+    assert(frame->nb_samples == 960);
+    int16_t *q = (int16_t*)frame->data[0];
+    unsigned long len = std::min(samples,(unsigned long)frame->nb_samples);
+    memcpy(q,data,samples*2);
+    write_audio_frame(oc, &audio_st, frame);
 }
 
 

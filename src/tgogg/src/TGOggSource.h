@@ -2,15 +2,15 @@
 // Created by Andrey Syvrachev on 21.10.2019.
 //
 
-#ifndef TGVOIPCONTEST_TGOGG_H
-#define TGVOIPCONTEST_TGOGG_H
+#ifndef TGVOIPCONTEST_TGOGGSOURCE_H
+#define TGVOIPCONTEST_TGOGGSOURCE_H
 
 #include <IPCMSource.h>
 #include <vector>
 
-class TGOgg: public IPCMSource {
+class TGOggSource: public IPCMSource {
 public:
-    TGOgg(const char* name);
+    TGOggSource(const char* name);
     const short *Samples() override { return _samples.data(); }
     unsigned long Size() override { return _samples.size() / 2; }
 private:
@@ -18,4 +18,4 @@ private:
 };
 
 
-#endif //TGVOIPCONTEST_TGOGG_H
+#endif //TGVOIPCONTEST_TGOGGSOURCE_H

@@ -2,7 +2,7 @@
 // Created by Andrey Syvrachev on 21.10.2019.
 //
 
-#include "TGOgg.h"
+#include "TGOggSource.h"
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -149,10 +149,10 @@ static void decode(const char *name, std::vector<short>& outSamples) {
     av_free(audio_dst_data);
 }
 
-TGOgg::TGOgg(const char *name) {
+TGOggSource::TGOggSource(const char *name) {
     decode(name,_samples);
 }
 
 std::shared_ptr<IPCMSource> IPCMSource::openOggFile(const char *name) {
-    return std::shared_ptr<IPCMSource>(new TGOgg(name));
+    return std::shared_ptr<IPCMSource>(new TGOggSource(name));
 }

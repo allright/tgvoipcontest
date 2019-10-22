@@ -30,6 +30,12 @@ private:
     const short* _end;
 };
 
+class OpusWriter {
+public:
+    OpusWriter(const char* name);
+    void WriteSamples(const int16_t* samples, size_t num_samples);
+};
+
 int main (int argc, const char *argv []) {
 
     auto testWavFileIn = argv[1];

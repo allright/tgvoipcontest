@@ -13,7 +13,7 @@ public:
     virtual unsigned long Size() = 0;
     ~IPCMSource(){}
 
-    static std::shared_ptr<IPCMSource> openOggFile(const char* name);
+    static std::shared_ptr<IPCMSource> openOggFile(const char* name, int freq);
 };
 
 

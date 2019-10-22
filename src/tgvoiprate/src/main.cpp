@@ -22,8 +22,8 @@ int main(int argc, const char *argv[]) {
 
 
 static float compare(const char *origPath, const char *degPath) {
-    auto orig = IPCMSource::openOggFile(origPath);//std::shared_ptr<IPCMSource>(new File(origPath));
-    auto deg =  IPCMSource::openOggFile(degPath);//std::shared_ptr<IPCMSource>(new File(degPath));
+    auto orig = IPCMSource::openOggFile(origPath, 16000);
+    auto deg =  IPCMSource::openOggFile(degPath, 16000);
    // printf("bestShift = %u samples (%f sec) ", bestShift, bestShift / 48000.0);
     return pesq((short *)orig->Samples(),orig->Size(),(short *)deg->Samples(),deg->Size());
 }

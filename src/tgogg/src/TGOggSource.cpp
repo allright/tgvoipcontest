@@ -155,6 +155,6 @@ TGOggSource::TGOggSource(const char *name) {
     decode(name,_samples);
 }
 
-std::shared_ptr<IPCMSource> IPCMSource::openOggFile(const char *name) {
+std::shared_ptr<IPCMSource> IPCMSource::openOggFile(const char *name,int freq) {
     return std::shared_ptr<IPCMSource>(new TGOggSource(name));
 }

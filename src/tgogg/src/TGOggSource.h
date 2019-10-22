@@ -12,7 +12,7 @@ class TGOggSource: public IPCMSource {
 public:
     TGOggSource(const char* name);
     const short *Samples() override { return _samples.data(); }
-    unsigned long Size() override { return _samples.size() / 2; }
+    unsigned long Size() override { return _samples.size(); }
 private:
     std::vector<short> _samples;
 };

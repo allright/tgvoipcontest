@@ -2,7 +2,8 @@ FROM debian:10.1
 RUN apt-get update -y && \
     apt-get clean && \
     apt-get install -y \
-    build-essential unzip make cmake automake autoconf libtool libopus-dev libssl-dev \
+    build-essential unzip make cmake automake autoconf libtool \
+    libopus-dev libssl-dev libavcodec-dev libswresample-dev libavutil-dev libavformat-dev libswscale-dev \
     && \
     apt-get clean
 
@@ -15,17 +16,8 @@ WORKDIR /work/submission/src/tgvoipcall/libs/libtgvoip
 RUN ./build_and_install_linux.sh
 
 WORKDIR /work/submission/src
-RUN mkdir -p /work/submission/src/.build/tgvoiprate
-WORKDIR /work/submission/src/.build/tgvoiprate
-RUN cmake ../../tgvoiprate -DCMAKE_BUILD_TYPE=RelWithDebInfo
-RUN make -j8
-RUN ls -al
-
-WORKDIR /work/submission/src
-RUN mkdir -p /work/submission/src/.build/tgvoipcall
-WORKDIR /work/submission/src/.build/tgvoipcall
-RUN cmake ../../tgvoipcall -DCMAKE_BUILD_TYPE=RelWithDebInfo
-RUN make -j8
-RUN ls -al
-
+RUN mkdir -p /work/submission/src/.build
 WORKDIR /work/submission/src/.build
+RUN cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo
+RUN make -j8
+RUN ls -al

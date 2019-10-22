@@ -29,7 +29,7 @@ static void add_stream(OutputStream *ost, AVFormatContext *oc,
     }
     ost->enc = c;
 
-    assert((*codec)->type == AVMEDIA_TYPE_AUDIO);
+  //  assert((*codec)->type == AVMEDIA_TYPE_AUDIO);
     c->sample_fmt = AV_SAMPLE_FMT_FLTP;
     c->bit_rate = 64000;
     c->sample_rate = 48000;
@@ -79,7 +79,7 @@ static void open_audio(AVFormatContext *oc, AVCodec *codec, OutputStream *ost, A
     av_dict_free(&opt);
 
     if (ret < 0) {
-        throw StrException( "Could not open audio codec: %s\n", av_err2str(ret));
+        throw StrException( "Could not open audio codec: %d\n", ret);
     }
 
     /* init signal generator */
@@ -92,7 +92,7 @@ static void open_audio(AVFormatContext *oc, AVCodec *codec, OutputStream *ost, A
     else
         nb_samples = c->frame_size;
 
-    assert(nb_samples == 960);
+    //assert(nb_samples == 960);
 
     ost->frame     = alloc_audio_frame(c->sample_fmt, c->channel_layout, c->sample_rate, nb_samples);
     ost->tmp_frame = alloc_audio_frame(AV_SAMPLE_FMT_S16, c->channel_layout, c->sample_rate, nb_samples);
@@ -218,12 +218,12 @@ static int write_audio_frame(AVFormatContext *oc, OutputStream *ost,AVFrame *fra
 
     ret = avcodec_encode_audio2(c, &pkt, frame, &got_packet);
     if (ret < 0) {
-        throw StrException( "Error encoding audio frame: %s\n", av_err2str(ret));
+        throw StrException( "Error encoding audio frame: %d\n", ret);
     }
     if (got_packet) {
         ret = write_frame(oc, &c->time_base, ost->st, &pkt);
         if (ret < 0) {
-            throw StrException( "Error while writing audio frame: %s\n", av_err2str(ret));
+            throw StrException( "Error while writing audio frame: %d\n", ret);
         }
     }
     return (frame || got_packet) ? 0 : 1;
@@ -250,14 +250,14 @@ TGOggWriter::TGOggWriter(const char* name) {
     if (!(fmt->flags & AVFMT_NOFILE)) {
         int ret = avio_open(&oc->pb, name, AVIO_FLAG_WRITE);
         if (ret < 0) {
-            throw StrException( "Could not open '%s': %s\n", name, av_err2str(ret));
+            throw StrException( "Could not open '%s': %d\n", name, ret);
         }
     }
 
     /* Write the stream header, if any. */
     int ret = avformat_write_header(oc, &opt);
     if (ret < 0) {
-        throw StrException( "Error occurred when opening output file: %s\n",av_err2str(ret));
+        throw StrException( "Error occurred when opening output file: %d\n",ret);
     }
 //
 //    int  encode_audio = 1;
@@ -289,7 +289,7 @@ TGOggWriter::~TGOggWriter() {
 void TGOggWriter::Write(const short* data, unsigned long samples) {
   //  printf("TGOggWriter::Write(num = %zu)\n",samples);
     AVFrame *frame = audio_st.tmp_frame;
-    assert(frame->nb_samples == 960);
+   // assert(frame->nb_samples == 960);
     int16_t *q = (int16_t*)frame->data[0];
     unsigned long len = std::min(samples,(unsigned long)frame->nb_samples);
     memcpy(q,data,samples*2);

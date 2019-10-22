@@ -2,3 +2,4 @@
 cmake-build-debug
 src/tgvoipcallpy/venv
 submission.zip
+.build

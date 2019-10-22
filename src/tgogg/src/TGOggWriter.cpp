@@ -3,32 +3,6 @@
 //
 
 #include "TGOggWriter.h"
-
-extern "C" {
-#include <libavutil/avassert.h>
-#include <libavutil/channel_layout.h>
-#include <libavutil/opt.h>
-#include <libavutil/mathematics.h>
-#include <libavutil/timestamp.h>
-#include <libavformat/avformat.h>
-#include <libswscale/swscale.h>
-#include <libswresample/swresample.h>
-}
-
-// a wrapper around a single output AVStream
-typedef struct OutputStream {
-    AVStream *st;
-    AVCodecContext *enc;
-    /* pts of the next frame that will be generated */
-    int64_t next_pts;
-    int samples_count;
-    AVFrame *frame;
-    AVFrame *tmp_frame;
-    float t, tincr, tincr2;
-    struct SwsContext *sws_ctx;
-    struct SwrContext *swr_ctx;
-} OutputStream;
-
 #include <StrException.h>
 
 /* Add an output stream. */
@@ -117,6 +91,8 @@ static void open_audio(AVFormatContext *oc, AVCodec *codec, OutputStream *ost, A
     else
         nb_samples = c->frame_size;
 
+    assert(nb_samples == 960);
+
     ost->frame     = alloc_audio_frame(c->sample_fmt, c->channel_layout, c->sample_rate, nb_samples);
     ost->tmp_frame = alloc_audio_frame(AV_SAMPLE_FMT_S16, c->channel_layout, c->sample_rate, nb_samples);
 
@@ -204,17 +180,16 @@ static int write_frame(AVFormatContext *fmt_ctx, const AVRational *time_base, AV
  * encode one audio frame and send it to the muxer
  * return 1 when encoding is finished, 0 otherwise
  */
-static int write_audio_frame(AVFormatContext *oc, OutputStream *ost)
+static int write_audio_frame(AVFormatContext *oc, OutputStream *ost,AVFrame *frame)
 {
     AVCodecContext *c;
     AVPacket pkt = { 0 }; // data and size must be 0;
-    AVFrame *frame;
+
     int ret;
     int got_packet;
     int dst_nb_samples;
     av_init_packet(&pkt);
     c = ost->enc;
-    frame = get_audio_frame(ost);
     if (frame) {
         /* convert samples from native format to destination codec format, using the resampler */
         /* compute destination number of samples */
@@ -227,43 +202,38 @@ static int write_audio_frame(AVFormatContext *oc, OutputStream *ost)
          */
         ret = av_frame_make_writable(ost->frame);
         if (ret < 0)
-            exit(1);
+            throw StrException("av_frame_make_writable ret = %d",ret);
         /* convert to destination format */
         ret = swr_convert(ost->swr_ctx,
                           ost->frame->data, dst_nb_samples,
                           (const uint8_t **)frame->data, frame->nb_samples);
         if (ret < 0) {
-            fprintf(stderr, "Error while converting\n");
-            exit(1);
+            throw StrException("Error while converting\n");
         }
         frame = ost->frame;
         frame->pts = av_rescale_q(ost->samples_count, (AVRational){1, c->sample_rate}, c->time_base);
         ost->samples_count += dst_nb_samples;
     }
+
     ret = avcodec_encode_audio2(c, &pkt, frame, &got_packet);
     if (ret < 0) {
-        fprintf(stderr, "Error encoding audio frame: %s\n", av_err2str(ret));
-        exit(1);
+        throw StrException( "Error encoding audio frame: %s\n", av_err2str(ret));
     }
     if (got_packet) {
         ret = write_frame(oc, &c->time_base, ost->st, &pkt);
         if (ret < 0) {
-            fprintf(stderr, "Error while writing audio frame: %s\n",
-                    av_err2str(ret));
-            exit(1);
+            throw StrException( "Error while writing audio frame: %s\n", av_err2str(ret));
         }
     }
     return (frame || got_packet) ? 0 : 1;
 }
 
 TGOggWriter::TGOggWriter(const char* name) {
-    AVFormatContext *oc;
 
     avformat_alloc_output_context2(&oc, NULL, NULL, name);
     if (!oc)
         throw StrException("ogg format not supported");
 
-    OutputStream audio_st = { 0 };
     AVOutputFormat *fmt = oc->oformat;
     AVCodec *audio_codec;
 
@@ -291,21 +261,28 @@ TGOggWriter::TGOggWriter(const char* name) {
     int  encode_audio = 1;
     while (encode_audio) {
         /* select the stream to encode */
-        encode_audio = !write_audio_frame(oc, &audio_st);
+        AVFrame* frame = get_audio_frame(&audio_st);
+        encode_audio = !write_audio_frame(oc, &audio_st, frame);
     }
+
+}
+
+TGOggWriter::~TGOggWriter() {
     /* Write the trailer, if any. The trailer must be written before you
-     * close the CodecContexts open when you wrote the header; otherwise
-     * av_write_trailer() may try to use memory that was freed on
-     * av_codec_close(). */
+ * close the CodecContexts open when you wrote the header; otherwise
+ * av_write_trailer() may try to use memory that was freed on
+ * av_codec_close(). */
     av_write_trailer(oc);
 
     close_stream(oc, &audio_st);
+    AVOutputFormat *fmt = oc->oformat;
     if (!(fmt->flags & AVFMT_NOFILE))
         /* Close the output file. */
         avio_closep(&oc->pb);
     /* free the stream */
     avformat_free_context(oc);
 }
+
 
 void TGOggWriter::Write(const short* data, unsigned long samples) {
     printf("TGOggWriter::Write(num = %zu)\n",samples);

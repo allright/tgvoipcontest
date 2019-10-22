@@ -7,6 +7,7 @@
 
 #include <exception>
 #include <iostream>
+#include <stdarg.h>
 
 class StrException : public std::exception {
 public:

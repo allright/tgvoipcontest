@@ -11,6 +11,7 @@ WORKDIR /work
 COPY submission.zip ./
 RUN unzip submission.zip
 
+
 WORKDIR /work/submission/src/tgvoipcall/libs/libtgvoip
 RUN ./build_and_install_linux.sh
 

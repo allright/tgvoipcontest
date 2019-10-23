@@ -42,7 +42,7 @@ private:
     IPCMDest& _dest;
 };
 
-void loopbackTest( const char *in, const char* out) {
+int loopbackTest( const char *in, const char* out) {
     auto orig = IPCMSource::openOggFile(in, 48000);
     auto dest = IPCMDest::openOggWriter(out);
 
@@ -89,12 +89,36 @@ void loopbackTest( const char *in, const char* out) {
     controller1.Connect();
     controller2.Connect();
 
-    usleep(20000000);
+    usleep(3000000);
+  //  reflector.SetDropAllPackets(true);
+    usleep(3000000);
+  //  reflector.SetDropAllPackets(false);
+    usleep(14000000);
 
     controller1.Stop();
     controller2.Stop();
 
     reflector.Stop();
+    return 0;
+}
+
+int call(const char* reflector_port,
+         const char* tag_caller_hex,
+         const char* encryption_key_hex,
+         const char* sound_in,
+         const char* sound_out,
+         const char* config,
+         const char* role) {
+    printf("%s> reflector:port = '%s'\n",role,reflector_port);
+    printf("%s> tag_caller_hex = '%s'\n",role,tag_caller_hex);
+    printf("%s> encryption_key_hex = '%s'\n",role,encryption_key_hex);
+    printf("%s> sound_in = '%s'\n",role,sound_in);
+    printf("%s> sound_out = '%s'\n",role,sound_out);
+    printf("%s> config = '%s'\n",role,config);
+    printf("%s> role = '%s'\n",role,role);
+    usleep(3000000);
+    printf("%s> fin\n",role);
+    return 0;
 }
 
 int main (int argc, const char *argv []) {
@@ -105,9 +129,8 @@ int main (int argc, const char *argv []) {
     }
 
     if (argv[1][0] == '-') {
-        loopbackTest( argv[2],argv[3]);
+        return loopbackTest( argv[2],argv[3]);
+    } else {
+        return call(argv[1],argv[2],argv[4],argv[6],argv[8],argv[10],argv[12]);
     }
-
-
-    return 0;
 }

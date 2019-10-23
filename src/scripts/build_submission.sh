@@ -13,6 +13,7 @@ rm -rf ./submission/src/tgvoipcallpy/venv
 zip -r submission.zip submission
 rm -rf ./submission
 
+touch ./src/scripts/DockerfileTestSubmission
 docker build -t tgvoipcontestbuild -f ./src/scripts/DockerfileBuildSubmission .
 rm -rf ./docker_build
 docker run -v ${PWD}/.docker_build:/out tgvoipcontestbuild cp ./tgvoiprate/tgvoiprate /out

@@ -101,30 +101,3 @@ callee_thread.start()
 
 caller_thread.join()
 callee_thread.join()
-
-#
-# def doubler(number):
-#     """
-#     A function that can be used by a thread
-#     """
-#     print(threading.currentThread().getName() + '\n')
-#     print(number * 2)
-#     print()
-#
-# if __name__ == '__main__':
-#     for i in range(5):
-#         my_thread = threading.Thread(target=doubler, args=(i,))
-#         my_thread.start()
-# caller_proc = subprocess.Popen(caller,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-#
-# while True:
-#     caller_proc.stdout.flush()
-#     line = caller_proc.stdout.readline()
-#     if len(line) > 0:
-#         sys.stdout.write("A> ")
-#         sys.stdout.write(line)
-#         sys.stdout.flush()
-#     res = caller_proc.wait(0.2)
-#     if res == 0:
-#         break
-#        # print("A:%u> %s" % (len(line),line))

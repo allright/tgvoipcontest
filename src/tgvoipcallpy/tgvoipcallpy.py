@@ -5,6 +5,7 @@ import json
 import random
 import sys
 from threading import Thread
+import time
 
 auth_token = '677067:77f2c58ea74619d0a8115755ed7fcd62682a'
 
@@ -48,6 +49,7 @@ endpoints = result['endpoints']
 endpoint = endpoints[0]
 reflector = endpoint['ip']
 port = endpoint['port']
+id = endpoint['id']
 
 peer_tags = endpoint['peer_tags']
 tag_caller_hex = peer_tags['caller']
@@ -72,7 +74,8 @@ caller = [app,
         "-i", soundA,
         "-o", sound_output_B,
         "-c", "config.json",
-        "-r", "caller"]
+        "-r", "caller",
+        "-id", id]
 
 callee = [app,
           "%s:%s" % (reflector,port),
@@ -81,7 +84,8 @@ callee = [app,
           "-i", soundB,
           "-o", sound_output_A,
           "-c", "config.json",
-          "-r", "callee"]
+          "-r", "callee",
+          "-id", id]
 
 print caller
 print callee
@@ -96,8 +100,9 @@ def call_func(arg):
 caller_thread = Thread(target = call_func,args=(caller,))
 callee_thread = Thread(target = call_func,args=(callee,))
 
-caller_thread.start()
 callee_thread.start()
+time.sleep(1)
+caller_thread.start()
 
 caller_thread.join()
 callee_thread.join()

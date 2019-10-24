@@ -12,7 +12,11 @@ int main(int argc, const char *argv[]) {
 
     try {
         auto res = compare(argv[1], argv[2]);
-        printf("%f\n", res);
+        // remap to 1.0...5.0 value
+        float remapped = ((res - 1.0)/3.64 * 4.0) + 1.0;
+        if (remapped > 5.0)
+            remapped = 5.0;
+        printf("%f\n",remapped);
         return 0;
     } catch (std::exception &ex) {
         printf("Exception: '%s'", ex.what());

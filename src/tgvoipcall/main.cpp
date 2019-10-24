@@ -10,6 +10,7 @@
 #include <openssl/rand.h>
 #include <algorithm>
 #include <sstream>
+#include <fstream>
 
 using namespace tgvoip;
 
@@ -171,8 +172,18 @@ int call(const char *reflector_port,
     iss >> iId;
 
     printf("%s> Id = '%s:%llu'\n", role, id,iId);
-
     printf("%s> a reflector:port = '%s:%u'\n", role, ip.c_str(), p);
+
+    std::ifstream configFile;
+    configFile.open(config); //open the input file
+
+    std::stringstream strStream;
+    strStream << configFile.rdbuf(); //read the file
+    std::string configStr = strStream.str(); //configStr holds the content of the file
+
+    printf("%s> a config = '%s'\n", role, configStr.c_str());
+    ServerConfig::GetSharedInstance()->Update(configStr);
+
 
     std::array<uint8_t, 16> s_tag_hex;
     decodeHex(s_tag_hex, tag_hex, 16);
@@ -188,7 +199,7 @@ int call(const char *reflector_port,
 
     endpoints.push_back(Endpoint(iId, p, address, emptyV6, Endpoint::Type::UDP_RELAY, s_tag_hex.data()));
 
-    //auto cfg = ServerConfig::GetSharedInstance();
+    auto cfg = ServerConfig::GetSharedInstance();
 
     VoIPController controller;
 

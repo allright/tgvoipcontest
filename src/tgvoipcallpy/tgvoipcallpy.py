@@ -90,10 +90,13 @@ callee = [app,
 
 for c in caller:
     sys.stdout.write("%s "%c)
+sys.stdout.flush()
 print
 
 for c in callee:
     sys.stdout.write("%s "%c)
+sys.stdout.flush()
+
 print
 
 def call_func(arg):

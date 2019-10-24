@@ -4,6 +4,8 @@ rm -rf submission.zip
 rm -rf submission
 mkdir submission
 cp -a src submission/src
+cp -a src submission/deb-packages.txt
+
 find ./submission -type d -name '.*' -exec rm -rf {} +
 find ./submission -type f -name '.*' -exec rm {} +
 rm -rf ./submission/src/tgvoiprate/cmake-build-debug

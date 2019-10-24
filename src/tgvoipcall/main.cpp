@@ -152,7 +152,6 @@ int call(const char *reflector_port,
          const char *role,
          const char *id) {
 
-    printf("%s> reflector:port = '%s'\n", role, reflector_port);
     printf("%s> tag_hex = '%s'\n", role, tag_hex);
     printf("%s> encryption_key_hex = '%s'\n", role, encryption_key_hex);
     printf("%s> sound_in = '%s'\n", role, sound_in);
@@ -175,9 +174,8 @@ int call(const char *reflector_port,
         iss >> iId;
     }
 
-
-    printf("%s> Id = '%s:%llu'\n", role, id,iId);
-    printf("%s> a reflector:port = '%s:%u'\n", role, ip.c_str(), p);
+    printf("%s> Id = '%s:%llu'\n", role, id, iId);
+    printf("%s> reflector:port = '%s:%u'\n", role, ip.c_str(), p);
 
     std::ifstream configFile;
     configFile.open(config); //open the input file
@@ -186,9 +184,8 @@ int call(const char *reflector_port,
     strStream << configFile.rdbuf(); //read the file
     std::string configStr = strStream.str(); //configStr holds the content of the file
 
-    printf("%s> a config = '%s'\n", role, configStr.c_str());
+    printf("%s> config:%s = '%s'\n", role, config, configStr.c_str());
     ServerConfig::GetSharedInstance()->Update(configStr);
-
 
     std::array<uint8_t, 16> s_tag_hex;
     decodeHex(s_tag_hex, tag_hex, 16);
@@ -204,46 +201,43 @@ int call(const char *reflector_port,
 
     endpoints.push_back(Endpoint(iId, p, address, emptyV6, Endpoint::Type::UDP_RELAY, s_tag_hex.data()));
 
-    auto cfg = ServerConfig::GetSharedInstance();
-
     VoIPController controller;
 
-
     controller.SetRemoteEndpoints(endpoints, false, 76);
-    controller.SetEncryptionKey((char*)s_encription_key.data(), isOutgoing);
+    controller.SetEncryptionKey((char *) s_encription_key.data(), isOutgoing);
 
-//    _controller->SetProxy(
-//            tgvoip::PROXY_SOCKS5,
-//            proxy.host.toStdString(),
-//            proxy.port,
-//            proxy.user.toStdString(),
-//            proxy.password.toStdString());
     auto snd_in = IPCMSource::openOggFile(sound_in, 48000);
     auto snd_out = IPCMDest::openOggWriter(sound_out);
 
     PCMReader sndInReader(*snd_in);
     PCMWriter sndOutWriter(*snd_out);
 
-    controller.SetAudioDataCallbacks([&sndInReader](int16_t *data, size_t len) {
-        printf("read len = %u", len);
-        sndInReader.ReadSamples(len, data);
+    bool stop = false;
+    controller.SetAudioDataCallbacks([&](int16_t *data, size_t len) {
+        auto r = sndInReader.ReadSamples(len, data);
+        if (r < len)
+            stop = true;
     }, [&sndOutWriter](int16_t *data, size_t len) {
-        printf("write len = %u", len);
-        sndOutWriter.WriteSamples(data,len);
+        sndOutWriter.WriteSamples(data, len);
     });
 
+    printf("%s> start \n", role);
     controller.Start();
-    usleep(2000000);
+    usleep(2000000);   // protect from "wrong fingerprint"
+    printf("%s> connect \n", role);
     controller.Connect();
-    usleep(20000000);
+    while (!stop) {
+        usleep(100000);
+    }
+    printf("%s> stopping \n", role);
+    usleep(3000000);
     controller.Stop();
-
-    printf("%s> fin res = '%s'\n", role,controller.GetDebugLog().c_str());
+    printf("%s> fin res = '%s'\n", role, controller.GetDebugLog().c_str());
     return 0;
 }
 
-std::map<std::string,std::string> parseOptions(int argc, const char *argv[]) {
-    std::map<std::string,std::string> options;
+std::map<std::string, std::string> parseOptions(int argc, const char *argv[]) {
+    std::map<std::string, std::string> options;
     for (auto i = 0; i < argc; i++) {
         auto key = argv[i];
         if (key[0] == '-') {
@@ -270,13 +264,11 @@ int main(int argc, const char *argv[]) {
             printf("invalid number of args\n");
             return -1;
         }
-        auto r = parseOptions(argc,argv);
-
-
+        auto r = parseOptions(argc, argv);
         return call(argv[1],
-                argv[2],
-                r["-k"].c_str(),
-                r["-i"].c_str(),
+                    argv[2],
+                    r["-k"].c_str(),
+                    r["-i"].c_str(),
                     r["-o"].c_str(),
                     r["-c"].c_str(),
                     r["-r"].c_str(),

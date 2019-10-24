@@ -60,6 +60,7 @@ soundA = sys.argv[2]
 sound_output_B = sys.argv[3]
 soundB = sys.argv[4]
 sound_output_A = sys.argv[5]
+rate_app = sys.argv[6]
 
 print reflector
 print port
@@ -74,18 +75,18 @@ caller = [app,
         "-i", soundA,
         "-o", sound_output_B,
         "-c", "config.json",
-        "-r", "caller",
-        "-id", id]
+        "-r", "caller"]
+      #  "-id", id]
 
 callee = [app,
           "%s:%s" % (reflector,port),
-          tag_caller_hex,
+          tag_callee_hex,
           "-k", encryption_key_hex,
           "-i", soundB,
           "-o", sound_output_A,
           "-c", "config.json",
-          "-r", "callee",
-          "-id", id]
+          "-r", "callee"]
+       #   "-id", id]
 
 print caller
 print callee
@@ -100,9 +101,11 @@ def call_func(arg):
 caller_thread = Thread(target = call_func,args=(caller,))
 callee_thread = Thread(target = call_func,args=(callee,))
 
-callee_thread.start()
-time.sleep(1)
 caller_thread.start()
+callee_thread.start()
 
 caller_thread.join()
 callee_thread.join()
+
+subprocess.call([rate_app,soundA,sound_output_A])
+subprocess.call([rate_app,soundB,sound_output_B])

@@ -17,7 +17,7 @@ def write_to_file(resp, filename):
 
 def get_config_for_call(call_id):
     url = "https://api.contest.com/voip%s/getConnection?call=alrightid%s" % (auth_token,call_id)
-    print url
+#    print url
     return requests.get(url)
 
 
@@ -62,11 +62,11 @@ soundB = sys.argv[4]
 sound_output_A = sys.argv[5]
 rate_app = sys.argv[6]
 
-print reflector
-print port
-print tag_caller_hex
-print tag_callee_hex
-print encryption_key_hex
+# print reflector
+# print port
+# print tag_caller_hex
+# print tag_callee_hex
+# print encryption_key_hex
 #call = [app, "in.wav", "oo.wav"]
 caller = [app,
         "%s:%s" % (reflector,port),
@@ -94,9 +94,7 @@ print callee
 
 def call_func(arg):
     proc_name = arg[12]
-    print "%s> start" % proc_name
     subprocess.call(arg)
-    print "%s> stop" % proc_name
 
 caller_thread = Thread(target = call_func,args=(caller,))
 callee_thread = Thread(target = call_func,args=(callee,))

@@ -152,13 +152,13 @@ int call(const char *reflector_port,
          const char *config,
          const char *role,
          const char *id) {
-
-    printf("%s> tag_hex = '%s'\n", role, tag_hex);
-    printf("%s> encryption_key_hex = '%s'\n", role, encryption_key_hex);
-    printf("%s> sound_in = '%s'\n", role, sound_in);
-    printf("%s> sound_out = '%s'\n", role, sound_out);
-    printf("%s> config = '%s'\n", role, config);
-    printf("%s> role = '%s'\n", role, role);
+//
+//    printf("%s> tag_hex = '%s'\n", role, tag_hex);
+//    printf("%s> encryption_key_hex = '%s'\n", role, encryption_key_hex);
+//    printf("%s> sound_in = '%s'\n", role, sound_in);
+//    printf("%s> sound_out = '%s'\n", role, sound_out);
+//    printf("%s> config = '%s'\n", role, config);
+//    printf("%s> role = '%s'\n", role, role);
 
     auto ref = split(reflector_port, ":");
     if (ref.size() != 2) {
@@ -175,8 +175,8 @@ int call(const char *reflector_port,
         iss >> iId;
     }
 
-    printf("%s> Id = '%s:%llu'\n", role, id, iId);
-    printf("%s> reflector:port = '%s:%u'\n", role, ip.c_str(), p);
+//    printf("%s> Id = '%s:%llu'\n", role, id, iId);
+//    printf("%s> reflector:port = '%s:%u'\n", role, ip.c_str(), p);
 
     std::ifstream configFile;
     configFile.open(config); //open the input file
@@ -185,7 +185,7 @@ int call(const char *reflector_port,
     strStream << configFile.rdbuf(); //read the file
     std::string configStr = strStream.str(); //configStr holds the content of the file
 
-    printf("%s> config:%s = '%s'\n", role, config, configStr.c_str());
+//    printf("%s> config:%s = '%s'\n", role, config, configStr.c_str());
     ServerConfig::GetSharedInstance()->Update(configStr);
 
     std::array<uint8_t, 16> s_tag_hex;
@@ -213,8 +213,10 @@ int call(const char *reflector_port,
     PCMReader sndInReader(*snd_in);
     PCMWriter sndOutWriter(*snd_out);
 
+    bool started = false;
     bool stop = false;
     controller.SetAudioDataCallbacks([&](int16_t *data, size_t len) {
+        started = true;
         auto r = sndInReader.ReadSamples(len, data);
         if (r < len)
             stop = true;
@@ -222,18 +224,30 @@ int call(const char *reflector_port,
         sndOutWriter.WriteSamples(data, len);
     });
 
-    printf("%s> start \n", role);
+//    printf("%s> start \n", role);
     controller.Start();
     usleep(2000000);   // protect from "wrong fingerprint"
-    printf("%s> connect \n", role);
+//    printf("%s> connect \n", role);
     controller.Connect();
+
+    auto started_count = 0;
     while (!stop) {
         usleep(100000);
+        if (started_count < 50)  {
+            started_count++;    // 50 -> means 5 sec
+        } else {
+            if (!started) {
+                fprintf(stderr,"error connecting to server: %s\n",reflector_port);
+                controller.Stop();
+                return -1;
+            }
+        }
     }
-    printf("%s> stopping \n", role);
+   // printf("%s> stopping \n", role);
     usleep(3000000);
     controller.Stop();
-    printf("%s> fin res = '%s'\n", role, controller.GetDebugLog().c_str());
+ //   printf("%s> fin res = '%s'\n", role, controller.GetDebugLog().c_str());
+    printf("%s\n", controller.GetDebugLog().c_str());
     return 0;
 }
 

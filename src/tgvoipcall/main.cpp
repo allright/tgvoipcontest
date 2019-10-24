@@ -3,7 +3,8 @@
 #include <tgvoip/VoIPServerConfig.h>
 
 #include "libs/libtgvoip/tests/MockReflector.h"
-#include "libs/libtgvoip/webrtc_dsp/common_audio/wav_file.h"
+#include "libs/libtgvoip/webrtc_dsp/rtc_base/logging.h"
+
 #include <IPCMSource.h>
 #include <IPCMDest.h>
 
@@ -251,11 +252,12 @@ std::map<std::string, std::string> parseOptions(int argc, const char *argv[]) {
 }
 
 int main(int argc, const char *argv[]) {
-
     if (argc < 4) {
         printf("invalid number of args\n");
         return -1;
     }
+
+    rtc::LogMessage::LogToDebug(rtc::LS_NONE);
 
     if (argv[1][0] == '-') {
         return loopbackTest(argv[2], argv[3]);

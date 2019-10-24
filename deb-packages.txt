@@ -1,0 +1,7 @@
+libopus-dev
+libssl-dev
+libavcodec-dev
+libswresample-dev
+libavutil-dev
+libavformat-dev
+libswscale-dev

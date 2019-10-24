@@ -151,6 +151,7 @@ int call(const char *reflector_port,
          const char *config,
          const char *role,
          const char *id) {
+
     printf("%s> reflector:port = '%s'\n", role, reflector_port);
     printf("%s> tag_hex = '%s'\n", role, tag_hex);
     printf("%s> encryption_key_hex = '%s'\n", role, encryption_key_hex);
@@ -167,9 +168,13 @@ int call(const char *reflector_port,
     auto ip = ref[0];
     auto port = ref[1];
     uint16_t p = std::atoi(port.c_str());
-    uint64_t iId;
-    std::istringstream iss(id);
-    iss >> iId;
+
+    uint64_t iId = 1;
+    if (strlen(id) > 0) {
+        std::istringstream iss(id);
+        iss >> iId;
+    }
+
 
     printf("%s> Id = '%s:%llu'\n", role, id,iId);
     printf("%s> a reflector:port = '%s:%u'\n", role, ip.c_str(), p);
@@ -206,6 +211,7 @@ int call(const char *reflector_port,
 
     controller.SetRemoteEndpoints(endpoints, false, 76);
     controller.SetEncryptionKey((char*)s_encription_key.data(), isOutgoing);
+
 //    _controller->SetProxy(
 //            tgvoip::PROXY_SOCKS5,
 //            proxy.host.toStdString(),
@@ -236,6 +242,20 @@ int call(const char *reflector_port,
     return 0;
 }
 
+std::map<std::string,std::string> parseOptions(int argc, const char *argv[]) {
+    std::map<std::string,std::string> options;
+    for (auto i = 0; i < argc; i++) {
+        auto key = argv[i];
+        if (key[0] == '-') {
+            i++;
+            if (i < argc) {
+                options[key] = argv[i];
+            }
+        }
+    }
+    return options;
+}
+
 int main(int argc, const char *argv[]) {
 
     if (argc < 4) {
@@ -250,6 +270,16 @@ int main(int argc, const char *argv[]) {
             printf("invalid number of args\n");
             return -1;
         }
-        return call(argv[1], argv[2], argv[4], argv[6], argv[8], argv[10], argv[12], argv[14]);
+        auto r = parseOptions(argc,argv);
+
+
+        return call(argv[1],
+                argv[2],
+                r["-k"].c_str(),
+                r["-i"].c_str(),
+                    r["-o"].c_str(),
+                    r["-c"].c_str(),
+                    r["-r"].c_str(),
+                    r["-id"].c_str());
     }
 }

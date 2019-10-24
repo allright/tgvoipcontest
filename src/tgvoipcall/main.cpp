@@ -237,7 +237,13 @@ int call(const char *reflector_port,
             started_count++;    // 50 -> means 5 sec
         } else {
             if (!started) {
-                fprintf(stderr,"error connecting to server: %s\n",reflector_port);
+                fprintf(stderr,"error connecting with params:\n");
+                fprintf(stderr,"%s> tag_hex = '%s'\n", role, tag_hex);
+                fprintf(stderr,"%s> encryption_key_hex = '%s'\n", role, encryption_key_hex);
+                fprintf(stderr,"%s> sound_in = '%s'\n", role, sound_in);
+                fprintf(stderr,"%s> sound_out = '%s'\n", role, sound_out);
+                fprintf(stderr,"%s> config = '%s'\n", role, config);
+                fprintf(stderr,"%s> role = '%s'\n", role, role);
                 controller.Stop();
                 return -1;
             }

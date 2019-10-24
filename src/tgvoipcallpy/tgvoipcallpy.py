@@ -88,9 +88,13 @@ callee = [app,
           "-r", "callee"]
        #   "-id", id]
 
-print caller
-print callee
+for c in caller:
+    sys.stdout.write("%s "%c)
+print
 
+for c in callee:
+    sys.stdout.write("%s "%c)
+print
 
 def call_func(arg):
     proc_name = arg[12]

@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <sstream>
 #include <fstream>
+#include <condition_variable>
 
 using namespace tgvoip;
 
@@ -213,13 +214,17 @@ int call(const char *reflector_port,
     PCMReader sndInReader(*snd_in);
     PCMWriter sndOutWriter(*snd_out);
 
-    bool started = false;
-    bool stop = false;
+    std::mutex mutex;
+    std::unique_lock<std::mutex> lock(mutex);
+
+    std::condition_variable started;
+    std::condition_variable stopped;
+
     controller.SetAudioDataCallbacks([&](int16_t *data, size_t len) {
-        started = true;
+        started.notify_all();
         auto r = sndInReader.ReadSamples(len, data);
         if (r < len)
-            stop = true;
+            stopped.notify_all();
     }, [&sndOutWriter](int16_t *data, size_t len) {
         sndOutWriter.WriteSamples(data, len);
     });
@@ -230,29 +235,29 @@ int call(const char *reflector_port,
 //    printf("%s> connect \n", role);
     controller.Connect();
 
-    auto started_count = 0;
-    while (!stop) {
-        usleep(100000);
-        if (started_count < 50)  {
-            started_count++;    // 50 -> means 5 sec
-        } else {
-            if (!started) {
-                fprintf(stderr,"error connecting with params:\n");
-                fprintf(stderr,"%s> tag_hex = '%s'\n", role, tag_hex);
-                fprintf(stderr,"%s> encryption_key_hex = '%s'\n", role, encryption_key_hex);
-                fprintf(stderr,"%s> sound_in = '%s'\n", role, sound_in);
-                fprintf(stderr,"%s> sound_out = '%s'\n", role, sound_out);
-                fprintf(stderr,"%s> config = '%s'\n", role, config);
-                fprintf(stderr,"%s> role = '%s'\n", role, role);
-                controller.Stop();
-                return -1;
-            }
-        }
+    auto wait_result = started.wait_for(lock, std::chrono::seconds(5));
+    switch (wait_result) {
+        case cv_status::no_timeout:
+            break;
+        case cv_status::timeout:
+            fprintf(stderr, "error connecting with params:\n");
+            fprintf(stderr, "%s> tag_hex = '%s'\n", role, tag_hex);
+            fprintf(stderr, "%s> encryption_key_hex = '%s'\n", role, encryption_key_hex);
+            fprintf(stderr, "%s> sound_in = '%s'\n", role, sound_in);
+            fprintf(stderr, "%s> sound_out = '%s'\n", role, sound_out);
+            fprintf(stderr, "%s> config = '%s'\n", role, config);
+            fprintf(stderr, "%s> role = '%s'\n", role, role);
+            controller.Stop();
+            return -1;
     }
-   // printf("%s> stopping \n", role);
+
+//    printf("%s> started \n", role);
+    stopped.wait(lock);
+
+//    printf("%s> stopping \n", role);
     usleep(3000000);
     controller.Stop();
- //   printf("%s> fin res = '%s'\n", role, controller.GetDebugLog().c_str());
+    //   printf("%s> fin res = '%s'\n", role, controller.GetDebugLog().c_str());
     printf("%s\n", controller.GetDebugLog().c_str());
     return 0;
 }
